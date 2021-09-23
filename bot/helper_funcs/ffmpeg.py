@@ -22,7 +22,6 @@ from bot import (
     UN_FINISHED_PROGRESS_STR,
     DOWNLOAD_LOCATION,
     watermark,
-    cmd1,
     crf,
     pid_list
 )
