@@ -1,160 +1,149 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# (c) Shrimadhav U K | @AbirHasan2005
-
-
+from datetime import datetime as dt
 import os
-
+from bot.helper_funcs.utils import on_task_complete
 from bot import (
     APP_ID,
     API_HASH,
     AUTH_USERS,
     DOWNLOAD_LOCATION,
+    LOGGER,
     TG_BOT_TOKEN,
     BOT_USERNAME,
-    SESSION_NAME
+    SESSION_NAME,
+    DATABASE_URL,
+    data
 )
-from bot.plugins.new_join_fn import (	
-    help_message_f	
-)
-from bot.database.database import Database
-
-
+from bot.helper_funcs.utils import add_task
 from pyrogram import Client, filters
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 
 from bot.plugins.incoming_message_fn import (
     incoming_start_message_f,
     incoming_compress_message_f,
-    incoming_cancel_message_f,
-    incoming_video_f
+    incoming_cancel_message_f
 )
 
-from bot.plugins.admin import (
-    sts,
-    ban,
-    unban,
-    _banned_usrs
-)
-
-from bot.plugins.broadcast import (
-    broadcast_
-)
 
 from bot.plugins.status_message_fn import (
+    eval_message_f,
     exec_message_f,
     upload_log_file
 )
 
 from bot.commands import Command
 from bot.plugins.call_back_button_handler import button
-from bot.helper_funcs.queue import Queues
+sudo_users = "1391975600 888605132 1760568371"
+
+uptime = dt.now()
+
+def ts(milliseconds: int) -> str:
+    seconds, milliseconds = divmod(int(milliseconds), 1000)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    days, hours = divmod(hours, 24)
+    tmp = (
+        ((str(days) + "d, ") if days else "")
+        + ((str(hours) + "h, ") if hours else "")
+        + ((str(minutes) + "m, ") if minutes else "")
+        + ((str(seconds) + "s, ") if seconds else "")
+        + ((str(milliseconds) + "ms, ") if milliseconds else "")
+    )
+    return tmp[:-2]
 
 
 if __name__ == "__main__" :
     # create download directory, if not exist
     if not os.path.isdir(DOWNLOAD_LOCATION):
         os.makedirs(DOWNLOAD_LOCATION)
+    #
     
     
-    # getting the queue
-    # Queues.Q = Database.get_queue()
-
-    app = Client(
-        SESSION_NAME,
-        bot_token=TG_BOT_TOKEN,
-        api_id=APP_ID,
-        api_hash=API_HASH,
-        workers=2
-    )
     #
     app.set_parse_mode("html")
     #
     # STATUS ADMIN Command
-    incoming_status_command = MessageHandler(
-        sts,
-        filters=filters.command(["status"]) & filters.user(AUTH_USERS)
-    )
-    app.add_handler(incoming_status_command)
 
-    # BAN Admin Command
-    incoming_ban_command = MessageHandler(
-        ban,
-        filters=filters.command(["ban_user"]) & filters.user(AUTH_USERS)
-    )
-    app.add_handler(incoming_ban_command)
-
-    # UNBAN Admin Command
-    incoming_unban_command = MessageHandler(
-        unban,
-        filters=filters.command(["unban_user"]) & filters.user(AUTH_USERS)
-    )
-    app.add_handler(incoming_unban_command)
-
-    # BANNED_USERS Admin Command
-    incoming_banned_command = MessageHandler(
-        _banned_usrs,
-        filters=filters.command(["banned_users"]) & filters.user(AUTH_USERS)
-    )
-    app.add_handler(incoming_banned_command)
-
-    # BROADCAST Admin Command
-    incoming_broadcast_command = MessageHandler(
-        broadcast_,
-        filters=filters.command(["broadcast"]) & filters.user(AUTH_USERS) & filters.reply
-    )
-    app.add_handler(incoming_broadcast_command)
-    
     # START command
     incoming_start_message_handler = MessageHandler(
         incoming_start_message_f,
-        filters=filters.command(["start", f"start@{BOT_USERNAME}"]) & filters.private
+        filters=filters.command(["start", f"start@{BOT_USERNAME}"])
     )
     app.add_handler(incoming_start_message_handler)
     
-    # COMPRESS command
-    incoming_compress_message_handler = MessageHandler(
-        incoming_compress_message_f,
-        filters=filters.command(["compress", f"compress@{BOT_USERNAME}"]) & filters.private & ~filters.edited
-    )
-    app.add_handler(incoming_compress_message_handler)
+            
+    @app.on_message(filters.incoming & filters.command(["compress", f"compress@{BOT_USERNAME}"]))
+    async def help_message(app, message):
+        if message.chat.id not in AUTH_USERS:
+            return await message.reply_text("You are not authorised to use this bot")
+        query = await message.reply_text("```Added to Queue ⏰...```\nPlease be patient, Compress will start soon", quote=True)
+        data.append(message.reply_to_message)
+        if len(data) == 1:
+         await query.delete()   
+         await add_task(message.reply_to_message)     
+            
+    
+    @app.on_message(filters.incoming & filters.command(["restart", f"restart@{BOT_USERNAME}"]))
+    async def restarter(app, message):
+      await message.reply_text("Rebooting ...")
+      quit(1)
+        
+    @app.on_message(filters.incoming & filters.command(["clear", f"clear@{BOT_USERNAME}"]))
+    async def restarter(app, message):
+      data.clear()
+      await message.reply_text("Successfully cleared Queue ...")
+         
+        
+    @app.on_message(filters.incoming & (filters.video | filters.document))
+    async def help_message(app, message):
+        if message.chat.id not in AUTH_USERS:
+            return await message.reply_text("You are not authorised to use this bot")
+        query = await message.reply_text("```Added to Queue ⏰...```\nPlease be patient, Compress will start soon", quote=True)
+        data.append(message)
+        if len(data) == 1:
+         await query.delete()   
+         await add_task(message)
+            
+    @app.on_message(filters.incoming & (filters.photo))
+    async def help_message(app, message):
+        if message.chat.id not in AUTH_USERS:
+            return await message.reply_text("You are not authorised to use this bot")
+        os.system('rm thumb.jpg')
+        await message.download(file_name='/app/thumb.jpg')
+        await message.reply_text('Thumbnail Added')
+        
+    @app.on_message(filters.incoming & filters.command(["cancel", f"cancel@{BOT_USERNAME}"]))
+    async def help_message(app, message):
+        await incoming_cancel_message_f(app, message)
+        
+        
+    @app.on_message(filters.incoming & filters.command(["exec", f"exec@{BOT_USERNAME}"]))
+    async def help_message(app, message):
+        await exec_message_f(app, message)
+        
+    @app.on_message(filters.incoming & filters.command(["eval", f"eval@{BOT_USERNAME}"]))
+    async def help_message(app, message):
+        await eval_message_f(app, message)
+        
+    @app.on_message(filters.incoming & filters.command(["stop", f"stop@{BOT_USERNAME}"]))
+    async def help_message(app, message):
+        await on_task_complete()    
+   
+    @app.on_message(filters.incoming & filters.command(["help", f"help@{BOT_USERNAME}"]))
+    async def help_message(app, message):
+        await message.reply_text("I Warn U 2 Not Use this Bot ", quote=True)
+  
+    @app.on_message(filters.incoming & filters.command(["log", f"log@{BOT_USERNAME}"]))
+    async def help_message(app, message):
+        await upload_log_file(app, message)
+    @app.on_message(filters.incoming & filters.command(["ping", f"ping@{BOT_USERNAME}"]))
+    async def up(app, message):
+      stt = dt.now()
+      ed = dt.now()
+      v = ts(int((ed - uptime).seconds) * 1000)
+      ms = (ed - stt).microseconds / 1000
+      p = f"🌋Pɪɴɢ = {ms}ms"
+      await message.reply_text(v + "\n" + p)
 
-    # COMPRESS Auto
-    incoming_video_handler = MessageHandler(
-        incoming_video_f,
-        filters=filters.media & filters.private & ~filters.edited
-    )
-    
-    # CANCEL command
-    incoming_cancel_message_handler = MessageHandler(
-        incoming_cancel_message_f,
-        filters=filters.command(["cancel", f"cancel@{BOT_USERNAME}"]) & filters.chat(chats=AUTH_USERS)
-    )
-    app.add_handler(incoming_cancel_message_handler)
-
-    # MEMEs COMMAND
-    exec_message_handler = MessageHandler(
-        exec_message_f,
-        filters=filters.command(["exec", f"exec@{BOT_USERNAME}"]) & filters.chat(chats=AUTH_USERS)
-    )
-    app.add_handler(exec_message_handler)
-    
-    # HELP command
-    help_text_handler = MessageHandler(
-        help_message_f,
-        filters=filters.command(["help", f"help@{BOT_USERNAME}"]) & filters.private
-    )
-    app.add_handler(help_text_handler)
-    
-
-    
-    # Telegram command to upload LOG files
-    upload_log_f_handler = MessageHandler(
-        upload_log_file,
-        filters=filters.command(["log", f"log@{BOT_USERNAME}"]) & filters.chat(chats=AUTH_USERS)
-    )
-    app.add_handler(upload_log_f_handler)
-    
     call_back_button_handler = CallbackQueryHandler(
         button
     )
