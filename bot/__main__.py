@@ -13,7 +13,6 @@ from bot import (
     TG_BOT_TOKEN,
     BOT_USERNAME,
     SESSION_NAME
-    cmd1
 )
 from bot.plugins.new_join_fn import (	
     help_message_f	
@@ -147,26 +146,7 @@ if __name__ == "__main__" :
     )
     app.add_handler(help_text_handler)
     
-    # 720p mode
-                
-    @app.on_message(filters.incoming & filters.command(["720p_mode", f"normal_mode@{BOT_USERNAME}"]))
-    async def help_message(app, message):
-        if message.chat.id not in AUTH_USERS:
-            return await message.reply_text("You are not authorised to use this bot")
-        await message.reply_text("```720p Mode has been set", quote=True)
-        cmd1.insert(0, "-c:v libx265 -map 0 -s 1280x720 -pix_fmt yuv420p -preset faster -c:a libopus -b:a 40k -c:s copy")
-     
-    # Normal mode 
-    @app.on_message(filters.incoming & filters.command(["normal_mode", f"720p_mode@{BOT_USERNAME}"]))
-    async def help_message(app, message):
-        if message.chat.id not in AUTH_USERS:
-            return await message.reply_text("You are not authorised to use this bot")
-        await message.reply_text("```Normal Mode has been set", quote=True)
-        cmd1.insert(0, "-c:v libx265 - -map 0 -s 846x480 -pix_fmt yuv420p -preset faster -c:a libopus -b:a 40k -c:s copy")
-     
-    
-                 
-    
+
     
     # Telegram command to upload LOG files
     upload_log_f_handler = MessageHandler(
