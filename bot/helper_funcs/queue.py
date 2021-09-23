@@ -14,16 +14,8 @@ class Queues:
         # Maybe use property instead. Would be better and safer for incomplete downloads with db support.
 
         if Queues.IS_BUZY: 
-            await update.reply_text(
-                'Your File Added to Queue!\nWait till I start Compressing.',
-                reply_markup=InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton('Show Bot Status', url=f'https://t.me/{LOG_CHANNEL}')
-                        ]
-                    ]
-                )
-            )  # maybe add a button to query number of items left in queue // position in queue
+            await update.reply_text('Added to queue 🗳 , Please wait Compress will start soon.')
+         # Fucking  dont mess , join @Animes_Encoded      
         else:
             try:
                 q = Queues.Q[0]
