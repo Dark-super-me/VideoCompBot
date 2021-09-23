@@ -38,7 +38,7 @@ UPDATES_CHANNEL = Config.UPDATES_CHANNEL
 
 crf = []
 watermark = []
-cmd1 = []
+
 data = []
 pid_list = []
 
