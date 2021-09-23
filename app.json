@@ -59,20 +59,7 @@
       "description": "Your Bot Username. Without `@` before Username!",
       "value": "",
       "required": true
-    },
-    "LOG_CHANNEL": {
-      "description": "Your Bot's Log Channel's Username. For Help ask in @linux_repo",
-      "value": "",
-      "required": true
       }
     },
   "stack": "container"
   }
-    
-   
-
-
-
-
-
-
