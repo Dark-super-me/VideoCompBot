@@ -41,7 +41,7 @@ broadcast_ids = {}
 
 
 async def _compress(bot: Client, update: Message, isAuto, target_percentage):
-    user_file = str(update.from_user.id) + ".FFMpegRoBot.mkv"
+    user_file = str(update.from_user.id) + ".[Encoded].mkv"
     saved_file_path = DOWNLOAD_LOCATION + "/" + user_file
     LOGGER.info(saved_file_path)
     d_start = time.time()
@@ -195,7 +195,7 @@ async def _compress(bot: Client, update: Message, isAuto, target_percentage):
                 text=Localisation.UPLOAD_START,
             )
             u_start = time.time()
-            caption = Localisation.COMPRESS_SUCCESS.replace('{}', downloaded_time, 1).replace('{}', compressed_time, 1)
+            caption = Localisation.COMPRESS_SUCCESS
             upload = await bot.send_video(
                 chat_id=update.chat.id,
                 video=o,
