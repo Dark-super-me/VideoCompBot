@@ -40,9 +40,8 @@ async def convert_video(video_file, output_directory, total_time, bot, message, 
     ##"-metadata", "title=@SenpaiAF", "-vf", "drawtext=fontfile=njnaruto.ttf:fontsize=20:fontcolor=black:x=15:y=15:text=" "Dark Encodes",
      ## -vf eq=gamma=1.4:saturation=1.4
     watermark.append('-vf "drawtext=fontfile=njnaruto.ttf:fontsize=20:fontcolor=white:x=15:y=15:text=@Animes_Encoded"')
-    crf.append("30")
-    cmd1.append("-c:v libx265 -s 846x480 -pix_fmt yuv420p -preset faster -map 0 -c:a libopus -b:a 40k -c:s copy")
-    file_genertor_command = f'ffmpeg -hide_banner -loglevel quiet -progress "{progress}" -i "{video_file}" {watermark[0]} {cmd1[0]} -crf {crf[0]}  "{out_put_file_name}" -y'
+    crf.append("30")                  
+    file_genertor_command = f'ffmpeg -hide_banner -loglevel quiet -progress "{progress}" -i "{video_file}" {watermark[0]}  -c:v libx265 -s 846x480 -pix_fmt yuv420p -preset faster -map 0 -c:a libopus -b:a 40k -c:s copy -crf {crf[0]}  "{out_put_file_name}" -y'
  #Done !!
     COMPRESSION_START_TIME = time.time()
     process = await asyncio.create_subprocess_shell(
