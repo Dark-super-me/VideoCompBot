@@ -39,7 +39,7 @@ from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, Usern
 #)
 os.system("wget https://telegra.ph/file/5c4635e173e7407694a63.jpg -O thumb.jpg")
 
-LOGS_CHANNEL = -1001283278354
+LOGS_CHANNEL = -1001244356213
 #db = Database(DATABASE_URL, SESSION_NAME)
 CURRENT_PROCESSES = {}
 CHAT_FLOOD = {}
@@ -89,7 +89,7 @@ async def incoming_start_message_f(bot, update):
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton('BOSS', url='https://t.me/Nur0ns')
+                    InlineKeyboardButton('BOSS', url='https://t.me/Bro_isDarkal')
                 ]
             ]
         ),
